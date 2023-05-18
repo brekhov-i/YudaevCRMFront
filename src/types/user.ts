@@ -3,7 +3,7 @@ export interface IUser {
     name: string;
     email: string;
     role: IRole;
-    chat: IChat[];
+    chat: string[];
 }
 
 export interface IRole {

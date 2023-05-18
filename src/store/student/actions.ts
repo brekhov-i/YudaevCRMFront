@@ -2,11 +2,10 @@ import { ActionTree } from "vuex";
 import { IStore, IStoreStudent } from "@/types/store";
 import { IStudent } from "@/types/student";
 import axios from "axios";
+import { IChat } from "@/types/user";
 
 export const actions: ActionTree<IStoreStudent, IStore> = {
   async getStudents({ commit, dispatch }, user) {
-    console.log(user)
-    let uri = `http://vm546666.eurodir.ru/api/student/chat/${user.chat}`;
     if(user.role.name === "admin") {
       await axios
           .get( "http://vm546666.eurodir.ru/api/student", {
@@ -28,15 +27,30 @@ export const actions: ActionTree<IStoreStudent, IStore> = {
         commit( "setChats", res.data );
       } );
     } else {
-      await axios
-          .get( uri, {
-            headers: {
-              Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
-            },
-          } )
-          .then( ( res: any ) => {
-            commit( "setStudents", res.data );
-          } );
+        const chats: IChat[] = []
+        for ( const chat of user.chat ) {
+            let uri = `http://vm546666.eurodir.ru/api/student/chat/${ chat._id }`;
+            await axios
+                .get( uri, {
+                    headers: {
+                        Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
+                    },
+                } )
+                .then( ( res: any ) => {
+                    commit( "setStudents", res.data );
+                } );
+            await axios.get( `http://vm546666.eurodir.ru/api/student/getChats/${ chat._id }`, {
+                headers: {
+                    Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
+                    UserRole: "admin",
+                },
+            } ).then( ( res: any ) => {
+                chats.push(res.data)
+
+            } );
+        }
+        commit( "setChats", chats );
+
     }
   },
 

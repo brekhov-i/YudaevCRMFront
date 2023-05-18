@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="header">
-      <div v-if="user.chat" class="chatId">Чат {{ 1 }}</div>
+      <div v-if="user.chat" class="chatId">{{ getChatTitle(user?.chat) }}</div>
       <router-link :to="`/admin/${user._id}`" class="userCart">
         <div class="userCart__name">{{ user.name }}</div>
       </router-link>
@@ -18,10 +18,26 @@
 import Table from "@/components/Table.vue";
 import { computed, ComputedRef, onMounted } from "vue";
 import { useStore } from "vuex";
+import { IChat } from "@/types/user";
 
 const store = useStore();
 
 const user: ComputedRef = computed( () => store.getters[ "Auth/user" ] );
+const chat: ComputedRef = computed(() => store.getters["Student/getChat", user.value.chat])
+
+const getChatTitle = computed(() => (chats: IChat[]) => {
+  let string: string = "";
+
+  chats.forEach((el, index) => {
+    if(index === chats.length -1) {
+      string = string + el.title
+    } else {
+      string = string + el.title + " и ";
+    }
+  })
+
+  return string;
+})
 
 onMounted( async () => {
   await store.dispatch( "Auth/getUser" ).then( () => {
