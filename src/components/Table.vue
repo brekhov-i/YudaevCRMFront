@@ -81,15 +81,12 @@ const filterItems = computed( () => {
   const newArr: IStudent[] | Object[] = [];
 
   students.value.map( item => {
-    console.log( item )
     const arr: IStudent | Object = {};
     cols.value.forEach( col => {
       arr[ col.name ] = item[ col.name ]
     } )
     newArr.push( arr );
   } )
-
-  console.log( newArr )
 
   const search = searchInput.value.toLowerCase();
 
@@ -100,7 +97,7 @@ const filterItems = computed( () => {
   return newArr.filter( ( item ) => {
     if ( selectedOption.value !== null ) {
       if ( selectedOption.value === 'chat' ) {
-        const id = chats.value.find(el => el.title.includes(search))._id;
+        const id = chats.value.find(el => el.title.includes(search))?._id;
         return item[ selectedOption.value ].includes( id );
       } else {
         return item[ selectedOption.value ].toLowerCase().includes( search );
