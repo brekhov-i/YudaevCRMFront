@@ -1,14 +1,17 @@
-import { createStore } from 'vuex'
+import Vuex, { StoreOptions } from "vuex";
+import { IStore } from "@/types/store";
+import { Auth } from "@/store/auth";
+import { Student } from "./student/index";
 
-export default createStore({
+const store = new Vuex.Store<IStore>({
   state: {
   },
   getters: {
   },
-  mutations: {
-  },
-  actions: {
-  },
   modules: {
-  }
-})
+    Auth,
+    Student
+  },
+});
+
+export default store;
