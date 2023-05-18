@@ -7,7 +7,7 @@ export const actions: ActionTree<IAuth, IStore> = {
   async login({ commit, dispatch }, formData) {
     try {
       await axios
-        .post("http://localhost:3000/api/user", formData)
+        .post("http://vm546666.eurodir.ru/api/user", formData)
         .then((res: any) => {
           localStorage.setItem("user-token", res.data.access_token);
           commit("updateToken", res.data.access_token);
@@ -19,7 +19,7 @@ export const actions: ActionTree<IAuth, IStore> = {
   async getUser({ commit, dispatch }) {
     try {
       await axios
-        .get("http://localhost:3000/api/user", {
+        .get("http://vm546666.eurodir.ru/api/user", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("user-token")}`,
           },

@@ -6,10 +6,10 @@ import axios from "axios";
 export const actions: ActionTree<IStoreStudent, IStore> = {
   async getStudents({ commit, dispatch }, user) {
     console.log(user)
-    let uri = `http://localhost:3000/api/student/chat/${user.chat}`;
+    let uri = `http://vm546666.eurodir.ru/api/student/chat/${user.chat}`;
     if(user.role.name === "admin") {
       await axios
-          .get( "http://localhost:3000/api/student", {
+          .get( "http://vm546666.eurodir.ru/api/student", {
             headers: {
               Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
             },
@@ -18,7 +18,7 @@ export const actions: ActionTree<IStoreStudent, IStore> = {
             commit( "setStudents", res.data );
           } );
 
-      await axios.get( "http://localhost:3000/api/student/getChats", {
+      await axios.get( "http://vm546666.eurodir.ru/api/student/getChats", {
         headers: {
           Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
           UserRole: "admin",
@@ -41,7 +41,7 @@ export const actions: ActionTree<IStoreStudent, IStore> = {
   },
 
   async uploadStudents( { commit }, formData ) {
-    await axios.post( "http://localhost:3000/api/student/upload", formData, {
+    await axios.post( "http://vm546666.eurodir.ru/api/student/upload", formData, {
       headers: {
         "Content-Type": 'multipart/form-data',
         Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
@@ -53,7 +53,7 @@ export const actions: ActionTree<IStoreStudent, IStore> = {
 
   async unloadStudents( { commit }, studentArr: IStudent[] ) {
 
-      await axios.post( "http://localhost:3000/api/student/getExcel", studentArr, { responseType: 'arraybuffer' } )
+      await axios.post( "http://vm546666.eurodir.ru/api/student/getExcel", studentArr, { responseType: 'arraybuffer' } )
           .then( ( res: any ) => {
               const buffer = res.data;
               const file = new Blob([buffer], { type: 'application/octet-stream' });
