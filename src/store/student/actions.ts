@@ -1,10 +1,7 @@
 import { ActionTree } from "vuex";
-import { IStore } from "@/types/store";
-import { IStoreStudent } from "@/types/store";
+import { IStore, IStoreStudent } from "@/types/store";
 import { IStudent } from "@/types/student";
 import axios from "axios";
-import * as ExcelJS from 'exceljs';
-import { Buffer } from 'buffer';
 
 export const actions: ActionTree<IStoreStudent, IStore> = {
   async getStudents({ commit, dispatch }, user) {
@@ -56,34 +53,16 @@ export const actions: ActionTree<IStoreStudent, IStore> = {
 
   async unloadStudents( { commit }, studentArr: IStudent[] ) {
 
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet( 'Чат 1' );
-
-    worksheet.getCell( `A1` ).value = "Имя";
-    worksheet.getCell( `B1` ).value = "Email";
-    worksheet.getCell( `C1` ).value = "Telegram";
-    worksheet.getCell( `D1` ).value = "Телефон";
-    worksheet.getCell( `E1` ).value = "Последний пройденный урок";
-
-    worksheet.getRow( 1 ).font = { bold: true };
-
-    studentArr.forEach( ( student, index ) => {
-      worksheet.getCell( `A${ index + 2 }` ).value = student.name;
-      worksheet.getCell( `B${ index + 2 }` ).value = student.email;
-      worksheet.getCell( `C${ index + 2 }` ).value = student.telegram;
-      worksheet.getCell( `D${ index + 2 }` ).value = student.phone;
-      worksheet.getCell( `E${ index + 2 }` ).value = student.lessons ? student.lessons[student.lessons?.length - 1] : "";
-    } )
-
-    await workbook.xlsx.writeBuffer().then((buffer: Buffer ) => {
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'example.xlsx';
-      a.click();
-      window.URL.revokeObjectURL(url);
-    });
-
+      await axios.post( "http://localhost:3000/api/student/getExcel", studentArr, { responseType: 'arraybuffer' } )
+          .then( ( res: any ) => {
+              const buffer = res.data;
+              const file = new Blob([buffer], { type: 'application/octet-stream' });
+              const url = window.URL.createObjectURL( file );
+              const a = document.createElement( 'a' );
+              a.href = url;
+              a.download = 'example.xlsx';
+              a.click();
+              window.URL.revokeObjectURL( url );
+          } );
   },
 };
