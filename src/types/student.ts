@@ -6,11 +6,11 @@ export interface IStudent {
     email: string;
     telegram: string;
     chat: string;
-    lessons?: ILesson[];
-    lastLesson?: ILesson | string | undefined;
+    lessons?: string[];
+    lastLesson?: string | undefined;
 }
 
 export interface ILesson {
     _id: string;
-    name: string;
+    title: string;
 }

@@ -1,18 +1,26 @@
 import { ActionTree } from "vuex";
-import { IAuth } from "@/types/store";
-import { IStore } from "@/types/store";
+import { IAuth, IStore } from "@/types/store";
 import axios from "axios";
 
 export const actions: ActionTree<IAuth, IStore> = {
   async login({ commit, dispatch }, formData) {
     try {
-      await axios
-        .post("http://vm546666.eurodir.ru/api/user", formData)
-        .then((res: any) => {
-          localStorage.setItem("user-token", res.data.access_token);
-          commit("updateToken", res.data.access_token);
-        });
+        await axios
+            .post( "http://vm546666.eurodir.ru/api/user", formData )
+            .then( ( res: any ) => {
+                console.log(res)
+                localStorage.setItem( "user-token", res.data.access_token );
+                commit( "updateToken", res.data.access_token );
+            } ).catch(function (error: any) {
+                // handle error
+                console.log(error)
+                // if(error.response?.data.statusCode === 401) {
+                //     localStorage.removeItem("user-token")
+                //     window.location.reload();
+                // }
+            })
     } catch (e) {
+        console.log( e )
     }
   },
 
@@ -26,7 +34,16 @@ export const actions: ActionTree<IAuth, IStore> = {
         })
         .then((res: any) => {
           commit("setUser", res.data);
-        });
-    } catch (e) {}
+        }).catch(function (error: any) {
+              // handle error
+              // console.log(error)
+              // if(error.response?.data.statusCode === 401) {
+              //     localStorage.removeItem("user-token")
+              //     window.location.reload();
+              // }
+          });
+    } catch (e) {
+        console.log( e )
+    }
   },
 };

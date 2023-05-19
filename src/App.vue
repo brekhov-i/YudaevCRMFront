@@ -6,12 +6,6 @@
 import { onMounted } from "vue";
 import { useStore } from "vuex";
 
-const store = useStore()
-
-onMounted( async () => {
-  await store.dispatch( "Auth/getUser" ).then( () => {
-  } )
-} )
 </script>
 
 <style lang="scss">

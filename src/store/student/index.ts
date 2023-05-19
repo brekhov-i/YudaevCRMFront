@@ -6,7 +6,8 @@ import { actions } from "@/store/student/actions";
 
 export const state: IStoreStudent = {
   students: [],
-  chats: []
+  chats: [],
+  lessons: []
 };
 
 const namespaced: boolean = true;

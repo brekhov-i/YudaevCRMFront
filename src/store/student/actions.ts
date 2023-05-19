@@ -6,63 +6,81 @@ import { IChat } from "@/types/user";
 
 export const actions: ActionTree<IStoreStudent, IStore> = {
   async getStudents({ commit, dispatch }, user) {
-    if(user.role.name === "admin") {
-      await axios
-          .get( "http://vm546666.eurodir.ru/api/student", {
-            headers: {
+      await axios.post( "http://vm546666.eurodir.ru/api/student/getLessons", {}, {
+          headers: {
               Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
-            },
-          } )
-          .then( ( res: any ) => {
-            commit( "setStudents", res.data );
-          } );
-
-      await axios.get( "http://vm546666.eurodir.ru/api/student/getChats", {
-        headers: {
-          Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
-          UserRole: "admin",
-        },
+              UserRole: "admin",
+          },
       } ).then( ( res: any ) => {
-        console.log(res.data)
-        commit( "setChats", res.data );
-      } );
-    } else {
-        const chats: IChat[] = []
-        for ( const chat of user.chat ) {
-            let uri = `http://vm546666.eurodir.ru/api/student/chat/${ chat._id }`;
-            await axios
-                .get( uri, {
-                    headers: {
-                        Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
-                    },
-                } )
-                .then( ( res: any ) => {
-                    commit( "setStudents", res.data );
-                } );
-            await axios.get( `http://vm546666.eurodir.ru/api/student/getChats/${ chat._id }`, {
-                headers: {
-                    Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
-                    UserRole: "admin",
-                },
-            } ).then( ( res: any ) => {
-                chats.push(res.data)
+          console.log( res.data )
+          commit( "setLessons", res.data );
+      } )
+      console.log(user)
+      if ( user.role.name === "admin" ) {
+          await axios.get( "http://vm546666.eurodir.ru/api/student/getChats", {
+              headers: {
+                  Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
+                  UserRole: "admin",
+              },
+          } ).then( ( res: any ) => {
+              console.log( res.data )
+              commit( "setChats", res.data );
+          } )
+          await axios
+              .get( "http://vm546666.eurodir.ru/api/student", {
+                  headers: {
+                      Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
+                  },
+              } )
+              .then( ( res: any ) => {
+                  commit( "setStudents", res.data );
+              } )
 
-            } );
-        }
+      } else {
+          const chats: IChat[] = []
+          for ( const chat of user.chat ) {
+              await axios.get( `http://vm546666.eurodir.ru/api/student/getChats/${ chat._id }`, {
+                  headers: {
+                      Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
+                      UserRole: "admin",
+                  },
+              } ).then( ( res: any ) => {
+                  chats.push( res.data )
+
+              } )
+
+              let uri = `http://vm546666.eurodir.ru/api/student/chat/${ chat._id }`;
+              await axios
+                  .get( uri, {
+                      headers: {
+                          Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
+                      },
+                  } )
+                  .then( ( res: any ) => {
+                      commit( "setStudents", res.data );
+                  } )
+
+          }
         commit( "setChats", chats );
 
     }
   },
 
   async uploadStudents( { commit }, formData ) {
-    await axios.post( "http://vm546666.eurodir.ru/api/student/upload", formData, {
-      headers: {
-        "Content-Type": 'multipart/form-data',
-        Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
-        UserRole: "admin",
-      },
-    } ).then( ( res: any ) => {
-    } )
+      await axios.post( "http://vm546666.eurodir.ru/api/student/upload", formData, {
+          headers: {
+              "Content-Type": 'multipart/form-data',
+              Authorization: `Bearer ${ localStorage.getItem( "user-token" ) }`,
+              UserRole: "admin",
+          },
+      } ).then( ( res: any ) => {
+      } ).catch( function ( error: any ) {
+          // handle error
+          if(error.response?.data.statusCode === 401) {
+              localStorage.removeItem("user-token")
+              window.location.reload();
+          }
+      } );
   },
 
   async unloadStudents( { commit }, studentArr: IStudent[] ) {
@@ -70,13 +88,19 @@ export const actions: ActionTree<IStoreStudent, IStore> = {
       await axios.post( "http://vm546666.eurodir.ru/api/student/getExcel", studentArr, { responseType: 'arraybuffer' } )
           .then( ( res: any ) => {
               const buffer = res.data;
-              const file = new Blob([buffer], { type: 'application/octet-stream' });
+              const file = new Blob( [ buffer ], { type: 'application/octet-stream' } );
               const url = window.URL.createObjectURL( file );
               const a = document.createElement( 'a' );
               a.href = url;
               a.download = 'example.xlsx';
               a.click();
               window.URL.revokeObjectURL( url );
+          } ).catch( function ( error: any ) {
+              // handle error
+              if(error.response?.data.statusCode === 401) {
+                  localStorage.removeItem("user-token")
+                  window.location.reload();
+              }
           } );
   },
 };

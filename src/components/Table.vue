@@ -72,7 +72,6 @@ const cols = ref( [
 
 const students: ComputedRef<IStudent[]> = computed( () => store.getters[ "Student/students" ] );
 const user: ComputedRef = computed( () => store.getters[ "Auth/user" ] );
-;
 
 const checkStudent = ref( [] );
 
@@ -87,6 +86,8 @@ const filterItems = computed( () => {
     } )
     newArr.push( arr );
   } )
+
+  console.log(newArr)
 
   const search = searchInput.value.toLowerCase();
 
@@ -108,6 +109,7 @@ const filterItems = computed( () => {
 } )
 
 const googleSheets = async () => {
+  console.log(checkStudent)
   await store.dispatch( "Student/unloadStudents", checkStudent.value )
 }
 

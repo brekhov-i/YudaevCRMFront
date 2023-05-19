@@ -1,5 +1,5 @@
 import { IChat, IUser } from "@/types/user";
-import { IStudent } from "@/types/student";
+import { ILesson, IStudent } from "@/types/student";
 
 export interface IStore {
 
@@ -12,5 +12,6 @@ export interface IAuth {
 
 export interface IStoreStudent {
     students: IStudent[],
-    chats: IChat[]
+    chats: IChat[],
+    lessons: ILesson[]
 }
